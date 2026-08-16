@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Note, CreateNoteData } from "../types/note";
+import type { Note, NewNote } from "../types/note";
 
 const API_BASE_URL = "https://notehub-public.goit.study/api";
 const API_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
@@ -33,7 +33,7 @@ export const fetchNotes = async (
   return response.data;
 };
 
-export const createNote = async (noteData: CreateNoteData): Promise<Note> => {
+export const createNote = async (noteData: NewNote): Promise<Note> => {
   const response = await notehubAPIInstance.post("/notes", noteData);
 
   return response.data;

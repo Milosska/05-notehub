@@ -23,7 +23,7 @@ import Modal from "@components/Modal";
 import NoteForm from "@components/NoteForm";
 
 // types
-import type { CreateNoteData } from "@shared-types/note";
+import type { NewNote } from "@shared-types/note";
 import type { FormikState } from "formik";
 
 function App() {
@@ -58,10 +58,8 @@ function App() {
   const queryClient = useQueryClient();
 
   type CreateNoteMutationVariables = {
-    noteData: CreateNoteData;
-    formResetCallback: (
-      nextState?: Partial<FormikState<CreateNoteData>>,
-    ) => void;
+    noteData: NewNote;
+    formResetCallback: (nextState?: Partial<FormikState<NewNote>>) => void;
   };
 
   const { mutate: handleNoteCreate, isPending: isNoteCreatePending } =

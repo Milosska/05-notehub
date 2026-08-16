@@ -1,9 +1,10 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import css from "./NoteForm.module.css";
+import { NOTE_TAGS } from "@shared-types/note";
 
 // types
-import type { CreateNoteData, Note } from "@shared-types/note";
+import type { NewNote, Note } from "@shared-types/note";
 import type { UseMutateFunction } from "@tanstack/react-query";
 import type { FormikState } from "formik";
 interface NoteFormProps {
@@ -12,10 +13,8 @@ interface NoteFormProps {
     Note,
     Error,
     {
-      noteData: CreateNoteData;
-      formResetCallback: (
-        nextState?: Partial<FormikState<CreateNoteData>>,
-      ) => void;
+      noteData: NewNote;
+      formResetCallback: (nextState?: Partial<FormikState<NewNote>>) => void;
     },
     unknown
   >;
@@ -27,7 +26,7 @@ const NoteForm = ({
   handleNoteCreate,
   isNoteCreatePending,
 }: NoteFormProps) => {
-  const initialFormValues: CreateNoteData = {
+  const initialFormValues: NewNote = {
     title: "",
     content: "",
     tag: "Todo",
@@ -39,7 +38,7 @@ const NoteForm = ({
       .max(50, "Title should not exceed 50 symbols.")
       .required("Title is required"),
     content: Yup.string().max(500, "Content should not exceed 500 symbols."),
-    tag: Yup.string().required("Tag is required"),
+    tag: Yup.string().oneOf(NOTE_TAGS).required("Tag is required"),
   });
 
   const { values, handleChange, handleSubmit, errors, touched, resetForm } =
@@ -91,11 +90,9 @@ const NoteForm = ({
           value={values.tag}
           onChange={handleChange}
         >
-          <option value="Todo">Todo</option>
-          <option value="Work">Work</option>
-          <option value="Personal">Personal</option>
-          <option value="Meeting">Meeting</option>
-          <option value="Shopping">Shopping</option>
+          {NOTE_TAGS.map((tag) => (
+            <option value={tag}>{tag}</option>
+          ))}
         </select>
         {errors.tag && touched.tag ? (
           <span className={css.error}>{errors.tag}</span>
