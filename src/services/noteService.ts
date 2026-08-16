@@ -3,7 +3,7 @@ import type { Note, CreateNoteData } from "../types/note";
 
 const API_BASE_URL = "https://notehub-public.goit.study/api";
 const API_TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
-const PER_PAGE = 10;
+const PER_PAGE = 12;
 
 const notehubAPIInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -20,7 +20,7 @@ interface FetchNotesResponse {
 
 export const fetchNotes = async (
   page: number,
-  query: string,
+  query: string = "",
 ): Promise<FetchNotesResponse> => {
   const response = await notehubAPIInstance.get("/notes", {
     params: {
