@@ -28,6 +28,7 @@
     "paths": {
       "@components/*": ["components/*"],
       "@services/*": ["services/*"],
+      "@hooks/*": ["hooks/*"],
       "@shared-types/*": ["types/*"]
     }
   },

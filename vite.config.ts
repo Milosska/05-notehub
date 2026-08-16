@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@components": path.resolve(import.meta.dirname, "src/components"),
       "@services": path.resolve(import.meta.dirname, "src/services"),
+      "@hooks": path.resolve(import.meta.dirname, "src/hooks"),
       "@shared-types": path.resolve(import.meta.dirname, "src/types"),
     },
   },
