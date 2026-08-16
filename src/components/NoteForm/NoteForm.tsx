@@ -19,9 +19,14 @@ interface NoteFormProps {
     },
     unknown
   >;
+  isNoteCreatePending: boolean;
 }
 
-const NoteForm = ({ setIsModalOpen, handleNoteCreate }: NoteFormProps) => {
+const NoteForm = ({
+  setIsModalOpen,
+  handleNoteCreate,
+  isNoteCreatePending,
+}: NoteFormProps) => {
   const initialFormValues: CreateNoteData = {
     title: "",
     content: "",
@@ -105,7 +110,11 @@ const NoteForm = ({ setIsModalOpen, handleNoteCreate }: NoteFormProps) => {
         >
           Cancel
         </button>
-        <button type="submit" className={css.submitButton} disabled={false}>
+        <button
+          type="submit"
+          className={css.submitButton}
+          disabled={isNoteCreatePending}
+        >
           Create note
         </button>
       </div>

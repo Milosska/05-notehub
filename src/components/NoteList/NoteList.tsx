@@ -3,9 +3,17 @@ import type { Note } from "@shared-types/note";
 
 interface NoteListProps {
   notes: Note[];
+  onNoteDelete: (noteId: string) => void;
+  isPending: boolean;
+  removeNoteId: string | undefined;
 }
 
-const NoteList = ({ notes }: NoteListProps) => {
+const NoteList = ({
+  notes,
+  onNoteDelete,
+  isPending,
+  removeNoteId,
+}: NoteListProps) => {
   return (
     <ul className={css.list}>
       {notes.map(({ id, title, content, tag }) => (
@@ -14,7 +22,13 @@ const NoteList = ({ notes }: NoteListProps) => {
           <p className={css.content}>{content}</p>
           <div className={css.footer}>
             <span className={css.tag}>{tag}</span>
-            <button className={css.button}>Delete</button>
+            <button
+              className={css.button}
+              disabled={isPending && removeNoteId === id}
+              onClick={() => onNoteDelete(id)}
+            >
+              Delete
+            </button>
           </div>
         </li>
       ))}

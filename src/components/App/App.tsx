@@ -8,7 +8,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 
 // services
-import { fetchNotes, createNote } from "@services/noteService";
+import { fetchNotes, createNote, deleteNote } from "@services/noteService";
 
 // styles
 import css from "./App.module.css";
@@ -57,16 +57,31 @@ function App() {
     ) => void;
   };
 
-  const { mutate: handleNoteCreate } = useMutation({
-    mutationFn: ({ noteData }: CreateNoteMutationVariables) =>
-      createNote(noteData),
-    onSuccess: (_, { formResetCallback }) => {
-      formResetCallback();
-      setIsModalOpen(false);
+  const { mutate: handleNoteCreate, isPending: isNoteCreatePending } =
+    useMutation({
+      mutationFn: ({ noteData }: CreateNoteMutationVariables) =>
+        createNote(noteData),
+      onSuccess: (_, { formResetCallback }) => {
+        formResetCallback();
+        setIsModalOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["notes"] });
+      },
+      onError: (error) => {
+        toast.error(`Failed to create note. ${error}`);
+      },
+    });
+
+  const {
+    mutate: handleNoteDelete,
+    isPending: isNoteDeletePending,
+    variables: removeNoteId,
+  } = useMutation({
+    mutationFn: (noteId: string) => deleteNote(noteId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
     onError: (error) => {
-      toast.error(`Failed to create note. ${error}`);
+      toast.error(`Failed to remove note. ${error}`);
     },
   });
 
@@ -86,12 +101,20 @@ function App() {
         </button>
       </header>
       {isLoading && <Loader />}
-      {!isError && notes.length > 0 && <NoteList notes={notes} />}
+      {!isError && notes.length > 0 && (
+        <NoteList
+          notes={notes}
+          onNoteDelete={handleNoteDelete}
+          isPending={isNoteDeletePending}
+          removeNoteId={removeNoteId}
+        />
+      )}
       {isModalOpen && (
         <Modal setIsModalOpen={setIsModalOpen}>
           <NoteForm
             setIsModalOpen={setIsModalOpen}
             handleNoteCreate={handleNoteCreate}
+            isNoteCreatePending={isNoteCreatePending}
           />
         </Modal>
       )}
