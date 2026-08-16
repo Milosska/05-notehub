@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 
 // services
-import { fetchNotes } from "@services/noteService";
+import { fetchNotes, createNote } from "@services/noteService";
 
 // styles
 import css from "./App.module.css";
@@ -13,9 +18,16 @@ import SearchBox from "@components/SearchBox";
 import Loader from "@components/Loader";
 import NoteList from "@components/NoteList";
 import Pagination from "@components/Pagination";
+import Modal from "@components/Modal";
+import NoteForm from "@components/NoteForm";
+
+// types
+import type { CreateNoteData } from "@shared-types/note";
+import type { FormikState } from "formik";
 
 function App() {
   const [page, setPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["notes", page],
     queryFn: () => fetchNotes(page),
@@ -36,6 +48,28 @@ function App() {
     }
   }, [isError, error]);
 
+  const queryClient = useQueryClient();
+
+  type CreateNoteMutationVariables = {
+    noteData: CreateNoteData;
+    formResetCallback: (
+      nextState?: Partial<FormikState<CreateNoteData>>,
+    ) => void;
+  };
+
+  const { mutate: handleNoteCreate } = useMutation({
+    mutationFn: ({ noteData }: CreateNoteMutationVariables) =>
+      createNote(noteData),
+    onSuccess: (_, { formResetCallback }) => {
+      formResetCallback();
+      setIsModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: (error) => {
+      toast.error(`Failed to create note. ${error}`);
+    },
+  });
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -47,10 +81,20 @@ function App() {
             setCurrentPage={setPage}
           />
         )}
-        {/* Кнопка створення нотатки */}
+        <button className={css.button} onClick={() => setIsModalOpen(true)}>
+          Create note +
+        </button>
       </header>
       {isLoading && <Loader />}
       {!isError && notes.length > 0 && <NoteList notes={notes} />}
+      {isModalOpen && (
+        <Modal setIsModalOpen={setIsModalOpen}>
+          <NoteForm
+            setIsModalOpen={setIsModalOpen}
+            handleNoteCreate={handleNoteCreate}
+          />
+        </Modal>
+      )}
       <Toaster position="top-right" />
     </div>
   );
