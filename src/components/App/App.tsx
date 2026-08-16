@@ -6,6 +6,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
+import { useDebouncedCallback } from "use-debounce";
 
 // services
 import { fetchNotes, createNote, deleteNote } from "@services/noteService";
@@ -27,26 +28,32 @@ import type { FormikState } from "formik";
 
 function App() {
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data, isLoading, isSuccess, isError, error } = useQuery({
-    queryKey: ["notes", page],
-    queryFn: () => fetchNotes(page),
+    queryKey: ["notes", page, query],
+    queryFn: () => fetchNotes(page, query),
     placeholderData: keepPreviousData,
   });
 
   const { notes, totalPages } = data || { notes: [], totalPages: 0 };
 
   useEffect(() => {
-    if (isSuccess && notes.length && totalPages === 0) {
+    if (isSuccess && notes.length === 0 && totalPages === 0) {
       toast.error(`No notes found for current request.`);
     }
-  }, [notes.length, totalPages, isSuccess]);
+  }, [notes.length, totalPages, isSuccess, query]);
 
   useEffect(() => {
     if (isError) {
       toast.error(`${error}`);
     }
   }, [isError, error]);
+
+  const handleSearchQueryChange = useDebouncedCallback((newQuery: string) => {
+    setQuery(newQuery);
+    setPage(1);
+  }, 300);
 
   const queryClient = useQueryClient();
 
@@ -88,7 +95,7 @@ function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox />
+        <SearchBox onSearchChange={handleSearchQueryChange} />
         {totalPages > 1 && (
           <Pagination
             totalPages={totalPages}
