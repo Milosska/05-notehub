@@ -22,7 +22,7 @@ export const fetchNotes = async (
   page: number,
   query: string = "",
 ): Promise<FetchNotesResponse> => {
-  const response = await notehubAPIInstance.get("/notes", {
+  const response = await notehubAPIInstance.get<FetchNotesResponse>("/notes", {
     params: {
       page,
       search: query,
@@ -34,13 +34,13 @@ export const fetchNotes = async (
 };
 
 export const createNote = async (noteData: NewNote): Promise<Note> => {
-  const response = await notehubAPIInstance.post("/notes", noteData);
+  const response = await notehubAPIInstance.post<Note>("/notes", noteData);
 
   return response.data;
 };
 
 export const deleteNote = async (noteId: string): Promise<Note> => {
-  const response = await notehubAPIInstance.delete(`/notes/${noteId}`);
+  const response = await notehubAPIInstance.delete<Note>(`/notes/${noteId}`);
 
   return response.data;
 };

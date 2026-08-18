@@ -3,6 +3,9 @@ import * as Yup from "yup";
 import css from "./NoteForm.module.css";
 import { NOTE_TAGS } from "@shared-types/note";
 
+// components
+import ErrorMessage from "@components/ErrorMessage";
+
 // types
 import type { NewNote, Note } from "@shared-types/note";
 import type { UseMutateFunction } from "@tanstack/react-query";
@@ -62,7 +65,7 @@ const NoteForm = ({
           onChange={handleChange}
         />
         {errors.title && touched.title ? (
-          <span className={css.error}>{errors.title}</span>
+          <ErrorMessage error={errors.title} />
         ) : null}
       </div>
 
@@ -77,7 +80,7 @@ const NoteForm = ({
           onChange={handleChange}
         />
         {errors.content && touched.content ? (
-          <span className={css.error}>{errors.content}</span>
+          <ErrorMessage error={errors.content} />
         ) : null}
       </div>
 
@@ -94,9 +97,7 @@ const NoteForm = ({
             <option value={tag}>{tag}</option>
           ))}
         </select>
-        {errors.tag && touched.tag ? (
-          <span className={css.error}>{errors.tag}</span>
-        ) : null}
+        {errors.tag && touched.tag ? <ErrorMessage error={errors.tag} /> : null}
       </div>
 
       <div className={css.actions}>
