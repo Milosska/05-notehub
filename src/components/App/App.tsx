@@ -7,7 +7,6 @@ import css from "./App.module.css";
 
 // hooks
 import { useFetchNotes } from "@hooks/useFetchNotes";
-import { useNotesMutations } from "@hooks/useNotesMutations";
 
 // components
 import SearchBox from "@components/SearchBox";
@@ -32,20 +31,6 @@ function App() {
     setPage(1);
   }, 300);
 
-  const {
-    noteCreateMutation: {
-      mutate: handleNoteCreate,
-      isPending: isNoteCreatePending,
-    },
-    noteDeleteMutation: {
-      mutate: handleNoteDelete,
-      isPending: isNoteDeletePending,
-      variables: removeNoteId,
-    },
-  } = useNotesMutations({
-    setModalClose: () => setIsModalOpen(false),
-  });
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -62,21 +47,10 @@ function App() {
         </button>
       </header>
       {isLoading && <Loader />}
-      {!isError && notes.length > 0 && (
-        <NoteList
-          notes={notes}
-          onNoteDelete={handleNoteDelete}
-          isPending={isNoteDeletePending}
-          removeNoteId={removeNoteId}
-        />
-      )}
+      {!isError && notes.length > 0 && <NoteList notes={notes} />}
       {isModalOpen && (
         <Modal setIsModalOpen={setIsModalOpen}>
-          <NoteForm
-            setIsModalOpen={setIsModalOpen}
-            handleNoteCreate={handleNoteCreate}
-            isNoteCreatePending={isNoteCreatePending}
-          />
+          <NoteForm setIsModalOpen={setIsModalOpen} />
         </Modal>
       )}
       <Toaster position="top-right" />

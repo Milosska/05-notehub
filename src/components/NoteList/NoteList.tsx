@@ -1,19 +1,24 @@
 import css from "./NoteList.module.css";
+
+// hooks
+import { useNotesMutations } from "@hooks/useNotesMutations";
+
+// types
 import type { Note } from "@shared-types/note";
 
 interface NoteListProps {
   notes: Note[];
-  onNoteDelete: (noteId: string) => void;
-  isPending: boolean;
-  removeNoteId: string | undefined;
 }
 
-const NoteList = ({
-  notes,
-  onNoteDelete,
-  isPending,
-  removeNoteId,
-}: NoteListProps) => {
+const NoteList = ({ notes }: NoteListProps) => {
+  const {
+    noteDeleteMutation: {
+      mutate: handleNoteDelete,
+      isPending,
+      variables: removeNoteId,
+    },
+  } = useNotesMutations();
+
   return (
     <ul className={css.list}>
       {notes.map(({ id, title, content, tag }) => (
@@ -25,7 +30,7 @@ const NoteList = ({
             <button
               className={css.button}
               disabled={isPending && removeNoteId === id}
-              onClick={() => onNoteDelete(id)}
+              onClick={() => handleNoteDelete(id)}
             >
               Delete
             </button>

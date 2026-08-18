@@ -6,11 +6,13 @@ import { createNote, deleteNote } from "@services/noteService";
 import type { NewNote } from "@shared-types/note";
 import type { FormikState } from "formik";
 
-interface useNotesMutations {
-  setModalClose: () => void;
+interface IUseNotesMutationsType {
+  setModalClose?: () => void;
 }
 
-export const useNotesMutations = ({ setModalClose }: useNotesMutations) => {
+export const useNotesMutations = ({
+  setModalClose,
+}: IUseNotesMutationsType = {}) => {
   const queryClient = useQueryClient();
 
   type CreateNoteMutationVariables = {
@@ -23,7 +25,7 @@ export const useNotesMutations = ({ setModalClose }: useNotesMutations) => {
       createNote(noteData),
     onSuccess: (_, { formResetCallback }) => {
       formResetCallback();
-      setModalClose();
+      if (setModalClose) setModalClose();
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
     onError: (error) => toast.error(`Failed to create note. ${error}`),

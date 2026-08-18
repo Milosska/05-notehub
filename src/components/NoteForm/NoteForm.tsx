@@ -3,32 +3,28 @@ import * as Yup from "yup";
 import css from "./NoteForm.module.css";
 import { NOTE_TAGS } from "@shared-types/note";
 
+// hooks
+import { useNotesMutations } from "@hooks/useNotesMutations";
+
 // components
 import ErrorMessage from "@components/ErrorMessage";
 
 // types
-import type { NewNote, Note } from "@shared-types/note";
-import type { UseMutateFunction } from "@tanstack/react-query";
-import type { FormikState } from "formik";
+import type { NewNote } from "@shared-types/note";
 interface NoteFormProps {
   setIsModalOpen: (isOpen: boolean) => void;
-  handleNoteCreate: UseMutateFunction<
-    Note,
-    Error,
-    {
-      noteData: NewNote;
-      formResetCallback: (nextState?: Partial<FormikState<NewNote>>) => void;
-    },
-    unknown
-  >;
-  isNoteCreatePending: boolean;
 }
 
-const NoteForm = ({
-  setIsModalOpen,
-  handleNoteCreate,
-  isNoteCreatePending,
-}: NoteFormProps) => {
+const NoteForm = ({ setIsModalOpen }: NoteFormProps) => {
+  const {
+    noteCreateMutation: {
+      mutate: handleNoteCreate,
+      isPending: isNoteCreatePending,
+    },
+  } = useNotesMutations({
+    setModalClose: () => setIsModalOpen(false),
+  });
+
   const initialFormValues: NewNote = {
     title: "",
     content: "",
@@ -52,6 +48,7 @@ const NoteForm = ({
         handleNoteCreate({ noteData: values, formResetCallback: resetForm });
       },
     });
+
   return (
     <form className={css.form} onSubmit={handleSubmit}>
       <div className={css.formGroup}>
